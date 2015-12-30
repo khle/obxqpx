@@ -3,9 +3,15 @@
 <head>
     <!-- Angular Material style sheet -->
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/daniel-nagy/md-data-table/master/dist/md-data-table.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.css">
+    
+    <link rel="stylesheet" href="css/app.css" type="text/css" >
 </head>
 
 <body ng-app="ObxQpxApp" ng-cloak>
+    <a id="totop" href="#"><i class="fa fa-angle-up"></i></a>
     <div layout="column" layout-fill>
         <md-toolbar class="md-short">
             <div class="md-toolbar-tools">
@@ -18,40 +24,45 @@
             </div>
         </md-toolbar>
         <md-content layout-margin layout-padding layout-fill ng-controller="MainCtrl" ng-cloak>
-            <div layout="row">
+            <div layout="row" id="start">
                 <!-- 1% padding to the left -->
                 <div flex="1"></div>
 
                 <!-- The main action happens here -->
                 <md-card flex>
                     <md-card-content>
-                        
+
                         <div layout>
                             <md-input-container flex>
                                 <label>Origin</label>
-                                <input name="origin" ng-model="origin" required>
-                                <div ng-messages="qpxForm.origin.$error" ng-show="qpxForm.origin.$dirty">
-                                    <div ng-message="required">This is required!</div>
+                                <input name="origin" ng-model="request.origin" required>
+                                <div ng-show="request.origin === ''">
+                                    <div ng-message="required">required</div>
                                 </div>
                             </md-input-container>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Destination</label>
-                                <input name="destination" ng-model="destination" required>
-                                <div ng-messages="qpxForm.destination.$error" ng-show="qpxForm.destination.$dirty">
-                                    <div ng-message="required">This is required!</div>
+                                <input name="destination" ng-model="request.destination" required>
+                                <div ng-show="request.destination === ''">
+                                    <div ng-message="required">required</div>
                                 </div>
                             </md-input-container>
                             <div flex="5"></div>
                             <div>
-                                <md-checkbox aria-label="NonStop" ng-model="data.nonstopOutbound" class="md-primary" style="margin-top: 30px;">
-                                    <label style="color: #AAA;">NonStop</label>
-                                </md-checkbox>
+                                <md-input-container flex>
+                                    <label style="color: #AAA;">Stops</label>
+                                    <md-select placeholder="Max stops" ng-model="request.outboundMaxStops">
+                                        <div ng-repeat="p in ['Non stop', 1, 2, 3, 4, 5, 6, 7, 8]">
+                                            <md-option value="{{p}}">{{p}}</md-option>
+                                        </div>
+                                    </md-select>
+                                </md-input-container>
                             </div>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Max connection time</label>
-                                <md-select placeholder="Max connection time" ng-model="outboundMaxConnTime">
+                                <md-select placeholder="Max connection time" ng-model="request.outboundMaxConnTime">
                                     <div ng-repeat="p in ['1 hour', '2 hours', '3 hours', '4 hours', '5 hours', '6 hours', '7 hours', '8 hours', '9 hours', '10 hours', '11 hours', '12 hours', 'No maximum']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -60,11 +71,11 @@
                         </div>
 
                         <div layout>
-                            <md-datepicker style="margin-top: 15px;" ng-model="departureDate" md-placeholder="Departure Date" required></md-datepicker>
+                            <md-datepicker style="margin-top: 15px;" ng-model="request.outboundDepartureDate" md-placeholder="Departure Date" required></md-datepicker>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Earliest Departure Time</label>
-                                <md-select placeholder="Earliest Departure Time" ng-model="outboundEarliestTime">
+                                <md-select placeholder="Earliest Departure Time" ng-model="request.outboundEarliestTime">
                                     <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -72,7 +83,7 @@
                             </md-input-container>
                             <div flex="1"></div>
                             <md-input-container>
-                                <md-select placeholder="am" ng-model="outboundEarliestAmPm">
+                                <md-select placeholder="am" ng-model="request.outboundEarliestAmPm">
                                     <div ng-repeat="p in ['am', 'pm']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -81,7 +92,7 @@
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Latest Departure Time</label>
-                                <md-select placeholder="Latest Departure Time" ng-model="outboundLatestTime">
+                                <md-select placeholder="Latest Departure Time" ng-model="request.outboundLatestTime">
                                     <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -89,7 +100,7 @@
                             </md-input-container>
                             <div flex="1"></div>
                             <md-input-container>
-                                <md-select placeholder="pm" ng-model="outboundLatestAmPm">
+                                <md-select placeholder="pm" ng-model="request.outboundLatestAmPm">
                                     <div ng-repeat="p in ['am', 'pm']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -100,67 +111,69 @@
                         <div layout>
                             <md-input-container>
                                 <label style="color: #AAA;">Tickets</label>
-                                <md-select placeholder="Number of tickets" ng-model="numTickets">
+                                <md-select placeholder="Number of tickets" ng-model="request.numTickets">
                                     <div ng-repeat="p in [1,2,3,4,5,6,7,8,9,10]">
                                         <md-option value="{{p}}">{{p}}</md-option>
-                                    </div>                                    
+                                    </div>
                                 </md-select>
                             </md-input-container>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Max Price per ticket per segment</label>
-                                <input name="max-price" ng-model="maxPrice">
-                                <div ng-messages="qpxForm.origin.$error" ng-show="qpxForm.origin.$dirty">
-                                    <div ng-message="required">This is required!</div>
-                                </div>
+                                <input name="max-price" ng-model="request.maxPrice">
                             </md-input-container>
                             <div flex="5"></div>
                             <div>
-                                <md-checkbox aria-label="Refundable" ng-model="data.refundable" class="md-primary" style="margin-top: 30px;">
+                                <md-checkbox aria-label="Refundable" ng-model="request.refundable" class="md-primary" style="margin-top: 30px;">
                                     <label style="color: #AAA;">Refundable</label>
                                 </md-checkbox>
                             </div>
                             <div flex="5"></div>
                             <div>
-                                <md-checkbox aria-label="RoundTrip" ng-model="data.roundtrip" class="md-primary" style="margin-top: 30px;">
+                                <md-checkbox aria-label="RoundTrip" ng-model="request.roundtrip" class="md-primary" style="margin-top: 30px;">
                                     <label style="color: #AAA;">Round Trip</label>
                                 </md-checkbox>
                             </div>
                         </div>
-                        
+
                         <div layout ng-show="data.roundtrip">
                             <md-input-container flex>
                                 <label>Destination</label>
-                                <input name="destination" ng-model="destination" disabled>                                
+                                <input name="destination" ng-model="request.destination" disabled>
                             </md-input-container>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Origin</label>
-                                <input name="origin" ng-model="origin" disabled>                                
-                            </md-input-container>                                                                                    
+                                <input name="origin" ng-model="request.origin" disabled>
+                            </md-input-container>
                             <div flex="5"></div>
                             <div>
-                                <md-checkbox aria-label="NonStop" ng-model="data.nonstopInbound" class="md-primary" style="margin-top: 30px;">
-                                    <label style="color: #AAA;">NonStop</label>
-                                </md-checkbox>
+                                <md-input-container flex>
+                                    <label style="color: #AAA;">Stops</label>
+                                    <md-select placeholder="Max stops" ng-model="request.inboundMaxStops">
+                                        <div ng-repeat="p in ['Non stop', 1, 2, 3, 4, 5, 6, 7, 8]">
+                                            <md-option value="{{p}}">{{p}}</md-option>
+                                        </div>
+                                    </md-select>
+                                </md-input-container>
                             </div>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Max connection time</label>
-                                <md-select placeholder="Max connection time" ng-model="inboundMaxConnTime">
+                                <md-select placeholder="Max connection time" ng-model="request.inboundMaxConnTime">
                                     <div ng-repeat="p in ['1 hour', '2 hours', '3 hours', '4 hours', '5 hours', '6 hours', '7 hours', '8 hours', '9 hours', '10 hours', '11 hours', '12 hours', 'No maximum']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
                                 </md-select>
                             </md-input-container>
                         </div>
-                        
-                        <div layout ng-show="data.roundtrip">
-                            <md-datepicker style="margin-top: 15px;" ng-model="departureDate" md-placeholder="Return Date" required></md-datepicker>
+
+                        <div layout ng-show="request.roundtrip">
+                            <md-datepicker style="margin-top: 15px;" ng-model="request.inboundDepartureDate" md-placeholder="Return Date" required></md-datepicker>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Earliest Return Time</label>
-                                <md-select placeholder="Earliest Return Time" ng-model="inboundEarliestTime">
+                                <md-select placeholder="Earliest Return Time" ng-model="request.inboundEarliestTime">
                                     <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -168,7 +181,7 @@
                             </md-input-container>
                             <div flex="1"></div>
                             <md-input-container>
-                                <md-select placeholder="am" ng-model="inboundEarliestAmPm">
+                                <md-select placeholder="am" ng-model="request.inboundEarliestAmPm">
                                     <div ng-repeat="p in ['am', 'pm']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -177,7 +190,7 @@
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Latest Return Time</label>
-                                <md-select placeholder="Latest Return Time" ng-model="inboundLatestTime">
+                                <md-select placeholder="Latest Return Time" ng-model="request.inboundLatestTime">
                                     <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -185,18 +198,18 @@
                             </md-input-container>
                             <div flex="1"></div>
                             <md-input-container>
-                                <md-select placeholder="pm" ng-model="inboundLatestAmPm">
+                                <md-select placeholder="pm" ng-model="request.inboundLatestAmPm">
                                     <div ng-repeat="p in ['am', 'pm']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
                                 </md-select>
-                            </md-input-container>                            
+                            </md-input-container>
                         </div>
 
                         <div layout>
                             <md-input-container>
                                 <label style="color: #AAA;">Prefered Cabin</label>
-                                <md-select placeholder="Prefered Cabin" ng-model="preferedCabin">
+                                <md-select placeholder="Prefered Cabin" ng-model="request.preferedCabin">
                                     <div ng-repeat="p in ['Coach', 'Premium Coach', 'Business', 'First Class', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -205,7 +218,7 @@
                             <div flex="5"></div>
                             <md-input-container>
                                 <label style="color: #AAA;">Alliance</label>
-                                <md-select placeholder="Alliance" ng-model="alliance">
+                                <md-select placeholder="Alliance" ng-model="request.alliance">
                                     <div ng-repeat="p in ['OneWorld', 'SkyTeam', 'Star', 'None']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -214,38 +227,19 @@
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Permitted Carriers</label>
-                                <input name="origin" ng-model="origin">
-                                <div ng-messages="qpxForm.origin.$error" ng-show="qpxForm.origin.$dirty">
-                                    <div ng-message="required">This is required!</div>
-                                </div>
+                                <input name="origin" ng-model="request.permittedCarriers">
                             </md-input-container>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Prohibited Carriers</label>
-                                <input name="origin" ng-model="origin">
-                                <div ng-messages="qpxForm.origin.$error" ng-show="qpxForm.origin.$dirty">
-                                    <div ng-message="required">This is required!</div>
-                                </div>
-                            </md-input-container>                            
+                                <input name="origin" ng-model="request.prohibitedCarriers">
+                            </md-input-container>
                         </div>
-                        <!--
-                        <div layout>
 
-                            <md-input-container flex>
-                                <label>Start date</label>
-                                <input type="date" ng-model="info.departuredate">
-                            </md-input-container>
-                            <md-input-container flex>
-                                <label>End date</label>
-                                <input type="date" ng-model="info.returndate">
-                            </md-input-container>
-                        </div>
-                        -->
-                        
                         <!-- The submit button -->
                         <div layout>
                             <div flex="90"></div>
-                            <md-button class="md-primary md-fab" ng-click="submit()">
+                            <md-button class="md-primary md-fab fa fa-search"  ng-click="submit()">
                             </md-button>
                         </div>
 
@@ -268,19 +262,62 @@
                 <md-card>
                     <md-card-content>
                         <md-list style="padding: 12px;">
-                        <md-card-header class="md-no-sticky">Sale Countries</md-card-header>
-                        <md-list-item ng-repeat="country in countries">
-                            <p>{{ country.name }}</p>
-                            <md-checkbox class="md-primary" ng-model="country.wanted"></md-checkbox>
-                        </md-list-item>
-                    </md-list>    
+                            <md-card-header class="md-no-sticky">Sale Countries</md-card-header>
+                            <md-list-item ng-repeat="country in countries">
+                                <p>{{ country.name }}</p>
+                                <md-checkbox class="md-primary" ng-model="country.wanted"></md-checkbox>
+                            </md-list-item>
+                        </md-list>
                     </md-card-content>
                 </md-card>
                 <!-- 1% padding to the right -->
                 <div flex="1"></div>
             </div>
+
+            <div layout="row" id="result">
+                <div flex="1"></div>
+                <md-card flex>
+                    <md-card-content>
+                        <div layout="row" layout-sm="column" layout-align="space-around" layout-margin layout-padding layout-fill>
+                            <md-progress-circular md-mode="indeterminate" ng-show="isSearching"></md-progress-circular>
+
+
+                            <md-table-container ng-show="doneSearching">
+                                <table md-table>
+                                    <thead md-head>
+                                        <tr md-row>
+                                            <th md-column md-numeric>Price
+                                            </th>
+                                            <th md-column>Sale Country
+                                            </th>
+                                            <th md-column>Departure Time
+                                            </th>
+                                            <th md-column>Arrival Time
+                                            </th>
+                                            <th md-column md-numeric>Duration
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody md-body>
+                                        <tr md-row ng-repeat="trip in response.trips">
+                                            <td md-cell>{{trip.price}}</td>
+                                            <td md-cell>{{trip.saleCountry}}</td>
+                                            <td md-cell>{{trip.departureTime}}</td>
+                                            <td md-cell>{{trip.arrivalTime}}</td>
+                                            <td md-cell>{{trip.duration}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </md-table-container>
+
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <div flex="1"></div>
+            </div>
+
         </md-content>
-        
+
     </div>
 
     <!-- Angular Material requires Angular.js Libraries -->
@@ -291,6 +328,19 @@
 
     <!-- Angular Material Library -->
     <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+
+    <!-- Angular Material Data table -->
+    <script src="https://cdn.rawgit.com/daniel-nagy/md-data-table/master/dist/md-data-table.min.js"></script>
+
+    <!-- Rx -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rx-angular/1.0.4/rx.angular.min.js"></script>
+    
+    <!-- Lodash -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>    
+
+    <!-- App specific -->
+    <script src="js/constants.js"></script>
     <script src="js/app.js"></script>
 
 </body>

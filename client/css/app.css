@@ -1,0 +1,44 @@
+html,
+body,
+md-content {
+  background-color: #f5f5f5 !important;
+  -moz-osx-font-smoothing: grayscale;
+}
+#totop {
+  position: fixed;
+  bottom: 6%;
+  right: 1.5%;
+  display: none;
+  z-index: 9999;
+  background: transparent;
+  border: 3px solid #366794;
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  text-align: center;
+}
+#totop i {
+  color: #366794;
+  line-height: 43px;
+  font-size: 33px;
+}
+#totop:hover {
+  background: #366794;
+}
+#totop:hover i {
+  color: #ffffff;
+}
+
+
+.dialogdemoBasicUsage #popupContainer {
+    position: relative;
+}
+.dialogdemoBasicUsage .footer {
+    width: 100%;
+    text-align: center;
+    margin-left: 20px;
+}
+.dialogdemoBasicUsage .footer, .dialogdemoBasicUsage .footer > code {
+    font-size: 0.8em;
+    margin-top: 50px;
+}
