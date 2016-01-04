@@ -76,7 +76,7 @@
                             <md-input-container flex>
                                 <label style="color: #AAA;">Earliest Departure Time</label>
                                 <md-select placeholder="Earliest Departure Time" ng-model="request.outboundEarliestTime">
-                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
+                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
                                 </md-select>
@@ -93,7 +93,7 @@
                             <md-input-container flex>
                                 <label style="color: #AAA;">Latest Departure Time</label>
                                 <md-select placeholder="Latest Departure Time" ng-model="request.outboundLatestTime">
-                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
+                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
                                 </md-select>
@@ -105,6 +105,36 @@
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
                                 </md-select>
+                            </md-input-container>
+                        </div>
+                        
+                        <div layout>
+                            <md-input-container>
+                                <label style="color: #AAA;">Prefered Cabin</label>
+                                <md-select placeholder="Prefered Cabin" ng-model="request.outboundPreferedCabin">
+                                    <div ng-repeat="p in ['Coach', 'Premium Coach', 'Business', 'First Class', 'No preference']">
+                                        <md-option value="{{p}}">{{p}}</md-option>
+                                    </div>
+                                </md-select>
+                            </md-input-container>
+                            <div flex="5"></div>
+                            <md-input-container>
+                                <label style="color: #AAA;">Alliance</label>
+                                <md-select placeholder="Alliance" ng-model="request.outboundAlliance">
+                                    <div ng-repeat="p in ['OneWorld', 'SkyTeam', 'Star', 'None']">
+                                        <md-option value="{{p}}">{{p}}</md-option>
+                                    </div>
+                                </md-select>
+                            </md-input-container>
+                            <div flex="5"></div>
+                            <md-input-container flex>
+                                <label>Permitted Carriers</label>
+                                <input name="origin" ng-model="request.outboundPermittedCarriers">
+                            </md-input-container>
+                            <div flex="5"></div>
+                            <md-input-container flex>
+                                <label>Prohibited Carriers</label>
+                                <input name="origin" ng-model="request.outboundProhibitedCarriers">
                             </md-input-container>
                         </div>
 
@@ -119,7 +149,7 @@
                             </md-input-container>
                             <div flex="5"></div>
                             <md-input-container flex>
-                                <label>Max Price per ticket per segment</label>
+                                <label>Max Price</label>
                                 <input name="max-price" ng-model="request.maxPrice">
                             </md-input-container>
                             <div flex="5"></div>
@@ -134,9 +164,9 @@
                                     <label style="color: #AAA;">Round Trip</label>
                                 </md-checkbox>
                             </div>
-                        </div>
+                        </div>                                                
 
-                        <div layout ng-show="data.roundtrip">
+                        <div layout ng-show="request.roundtrip">
                             <md-input-container flex>
                                 <label>Destination</label>
                                 <input name="destination" ng-model="request.destination" disabled>
@@ -167,14 +197,14 @@
                                 </md-select>
                             </md-input-container>
                         </div>
-
+                                                
                         <div layout ng-show="request.roundtrip">
                             <md-datepicker style="margin-top: 15px;" ng-model="request.inboundDepartureDate" md-placeholder="Return Date" required></md-datepicker>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Earliest Return Time</label>
                                 <md-select placeholder="Earliest Return Time" ng-model="request.inboundEarliestTime">
-                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
+                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
                                 </md-select>
@@ -191,7 +221,7 @@
                             <md-input-container flex>
                                 <label style="color: #AAA;">Latest Return Time</label>
                                 <md-select placeholder="Latest Return Time" ng-model="request.inboundLatestTime">
-                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', 'No preference']">
+                                    <div ng-repeat="p in ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
                                 </md-select>
@@ -206,10 +236,10 @@
                             </md-input-container>
                         </div>
 
-                        <div layout>
+                        <div layout ng-show="request.roundtrip">
                             <md-input-container>
                                 <label style="color: #AAA;">Prefered Cabin</label>
-                                <md-select placeholder="Prefered Cabin" ng-model="request.preferedCabin">
+                                <md-select placeholder="Prefered Cabin" ng-model="request.inboundPreferedCabin">
                                     <div ng-repeat="p in ['Coach', 'Premium Coach', 'Business', 'First Class', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -218,7 +248,7 @@
                             <div flex="5"></div>
                             <md-input-container>
                                 <label style="color: #AAA;">Alliance</label>
-                                <md-select placeholder="Alliance" ng-model="request.alliance">
+                                <md-select placeholder="Alliance" ng-model="request.inboundAlliance">
                                     <div ng-repeat="p in ['OneWorld', 'SkyTeam', 'Star', 'None']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -227,12 +257,12 @@
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Permitted Carriers</label>
-                                <input name="origin" ng-model="request.permittedCarriers">
+                                <input name="origin" ng-model="request.inboundPermittedCarriers">
                             </md-input-container>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Prohibited Carriers</label>
-                                <input name="origin" ng-model="request.prohibitedCarriers">
+                                <input name="origin" ng-model="request.inboundProhibitedCarriers">
                             </md-input-container>
                         </div>
 
@@ -278,7 +308,7 @@
                 <div flex="1"></div>
                 <md-card flex>
                     <md-card-content>
-                        <div layout="row" layout-sm="column" layout-align="space-around" layout-margin layout-padding layout-fill>
+                        <div layout="row" layout-sm="column" layout-margin layout-padding layout-fill flex>
                             <md-progress-circular md-mode="indeterminate" ng-show="isSearching"></md-progress-circular>
 
 
@@ -340,7 +370,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>    
 
     <!-- App specific -->
-    <script src="js/constants.js"></script>
+    <!--<script src="js/constants.js"></script>-->
     <script src="js/app.js"></script>
 
 </body>

@@ -16,121 +16,193 @@
                     wanted: false
                 }]
             }
-        ]).controller('MainCtrl', ['$scope', '$location', '$anchorScroll', '$http', '$mdDialog', 'qpxService', 'appConstants',
-            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService, appConstants) {
-                //console.log(rx);
-                /*
-            var source = rx.Observable.fromPromise($http({
-                url: "http://en.wikipedia.org/w/api.php?&callback=JSON_CALLBACK",
-                method: "jsonp",
-                params: {
-                    action: "opensearch",
-                    search: 'Rx',
-                    format: "json"
+        ]).controller('MainCtrl', ['$scope', '$location', '$anchorScroll', '$http', '$mdDialog', 'qpxService',
+            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService) {
+                
+                var mapPermittedTime = function(time, ampm, defAm) {                                        
+                    if (time == '1:00' && (ampm == 'am' && defAm)) {
+                        return '01:00';
+                    } else if (time == '1:00') {
+                        return '13:00';
+                    } else if (time == '2:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '02:00';
+                    } else if (time == '2:00') {
+                        return '14:00';
+                    } else if (time == '3:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '03:00';
+                    } else if (time == '3:00') {
+                        return '15:00';
+                    } else if (time == '4:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '04:00';
+                    } else if (time == '4:00') {
+                        return '16:00';
+                    } else if (time == '5:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '05:00';
+                    } else if (time == '5:00') {
+                        return '17:00';
+                    } else if (time == '6:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '06:00';
+                    } else if (time == '6:00') {
+                        return '18:00';
+                    } else if (time == '7:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '07:00';
+                    } else if (time == '7:00') {
+                        return '19:00';
+                    } else if (time == '8:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '08:00';
+                    } else if (time == '8:00') {
+                        return '20:00';
+                    } else if (time == '9:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '09:00';
+                    } else if (time == '9:00') {
+                        return '21:00';
+                    } else if (time == '10:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '10:00';
+                    } else if (time == '10:00') {
+                        return '22:00';
+                    } else if (time == '11:00' && (ampm == 'am' || (ampm == '' && defAm))) {
+                        return '11:00';
+                    } else if (time == '11:00') {
+                        return '23:00';
+                    } else return '';
                 }
-            })).map(function(response) {
-                return response.data[1];
-            });*/
+                
+                var mapMaxStops = function(maxStops) {
+                    if (maxStops == 'Non stop') 
+                        return '';
+                    else
+                        return parseInt(maxStops);
+                }
+                
+                var mapMaxConnTime = function(maxConnTime) {                    
+                    if (maxConnTime == '1 hour')
+                        return 60;
+                    else if (maxConnTime == '2 hours')
+                        return 120;
+                    else if (maxConnTime == '3 hours')
+                        return 180;
+                    else if (maxConnTime == '4 hours')
+                        return 240;
+                    else if (maxConnTime == '5 hours')
+                        return 300;
+                    else if (maxConnTime == '6 hours')
+                        return 360;
+                    else if (maxConnTime == '7 hours')
+                        return 420;
+                    else if (maxConnTime == '8 hours')
+                        return 480;
+                    else if (maxConnTime == '9 hours')
+                        return 540;
+                    else if (maxConnTime == '10 hours')
+                        return 600;
+                    else if (maxConnTime == '11 hours')
+                        return 660;
+                    else if (maxConnTime == '12 hours')
+                        return 720;
+                    else 
+                        return '';
+                }
+                
                 $scope.countries = [{
                     name: 'Argentina',
                     code: 'AR',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Australia',
                     code: 'AU',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Belgium',
                     code: 'BE',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Chile',
                     code: 'CL',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'China',
                     code: 'CN',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Colombia',
                     code: 'CO',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Denmark',
                     code: 'DK',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Ecuador',
                     code: 'EC',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'France',
                     code: 'FR',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Germany',
                     code: 'DE',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Great Britain',
                     code: 'GB',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Hong Kong',
                     code: 'HK',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'India',
                     code: 'IN',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Ireland',
                     code: 'IE',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Israel',
                     code: 'IL',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Italy',
                     code: 'IT',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Mexico',
                     code: 'MX',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Netherlands',
                     code: 'NL',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Norway',
                     code: 'NO',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Philippines',
                     code: 'PH',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Poland',
                     code: 'PL',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'South Korea',
                     code: 'KR',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Spain',
                     code: 'ES',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'Switzerland',
                     code: 'CH',
-                    wanted: true
+                    wanted: false
                 }, {
                     name: 'United States',
                     code: 'US',
-                    wanted: true
+                    wanted: false
                 }];
                 $scope.request = {
                     origin: 'SFO',
@@ -142,6 +214,10 @@
                     outboundEarliestAmPm: '',
                     outboundLatestTime: '',
                     outboundLatestAmPm: '',
+                    outboundPreferedCabin: '',
+                    outboundAlliance: '',
+                    outboundPermittedCarriers: '',
+                    outboundProhibitedCarriers: '',
                     numTickets: 1,
                     maxPrice: '',
                     refundable: '',
@@ -153,69 +229,151 @@
                     inboundEarliestAmPm: '',
                     inboundLatestTime: '',
                     inboundLatestAmPm: '',
-                    preferedCabin: '',
-                    alliance: '',
-                    permittedCarriers: '',
-                    prohibitedCarriers: ''
+                    inboundPreferedCabin: '',
+                    inboundAlliance: '',
+                    inboundPermittedCarriers: '',
+                    inboundProhibitedCarriers: ''
                 };
                 $scope.submit = function() {                    
-                    //source.forEach(function(x) {
-                    //    $scope.isSearching = false;
-                    //    console.log(x);
-                    //});                    
                     
-                    if($scope.request.origin.length === 0 || 
-                       $scope.request.destination.length === 0 || 
-                       !($scope.request.outboundDepartureDate instanceof Date)) {
-                        alert('Error');
-                        $scope.isSearching = false;                                           
-                    }
-                    else {
-                        $location.hash('result');
-                        $anchorScroll();
-                        $scope.isSearching = true;
-                        $scope.doneSearching = false;
-                        
-                        var postData = {
+                    var postDatum = _.map(_.filter($scope.countries, function(c) { return c.wanted; }), function(c) {
+                        var slices = $scope.request.roundtrip ? 
+                            [{                                
+                                "origin": $scope.request.origin,
+                                "destination": $scope.request.destination,
+                                "date": $scope.request.outboundDepartureDate.toISOString().substring(0, 10),
+                                "maxStops": mapMaxStops($scope.request.outboundMaxStops),
+                                "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime),
+                                "preferredCabin": $scope.request.outboundPreferedCabin,
+                                "permittedDepartureTime": {                                    
+                                    "earliestTime": mapPermittedTime($scope.request.outboundEarliestTime, $scope.request.outboundEarliestAmPm, true),
+                                    "latestTime": mapPermittedTime($scope.request.outboundLatestTime, $scope.request.outboundLatestAmPm, false)
+                                },
+                                "permittedCarrier": [
+                                    $scope.request.outboundPermittedCarriers
+                                ],
+                                "alliance": $scope.request.outboundAlliance,
+                                "prohibitedCarrier": [
+                                    $scope.request.outboundProhibitedCarriers
+                                ]    
+                            }, {                                
+                                "origin": $scope.request.destination,
+                                "destination": $scope.request.origin,
+                                "date": $scope.request.inboundDepartureDate.toISOString().substring(0, 10),
+                                "maxStops": mapMaxStops($scope.request.inboundMaxStops),
+                                "maxConnectionDuration": mapMaxConnTime($scope.request.inboundMaxConnTime),
+                                "preferredCabin": $scope.request.inboundPreferedCabin,
+                                "permittedDepartureTime": {                                    
+                                    "earliestTime": mapPermittedTime($scope.request.inboundEarliestTime, $scope.request.inboundEarliestAmPm, true),
+                                    "latestTime": mapPermittedTime($scope.request.inboundLatestTime, $scope.request.inboundLatestAmPm, false)
+                                },
+                                "permittedCarrier": [
+                                    $scope.request.inboundPermittedCarriers
+                                ],
+                                "alliance": $scope.request.inboundAlliance,
+                                "prohibitedCarrier": [
+                                    $scope.request.inboundProhibitedCarriers
+                                ]    
+                            }] : 
+                        [{                            
+                            "origin": $scope.request.origin,
+                            "destination": $scope.request.destination,
+                            "date": $scope.request.outboundDepartureDate.toISOString().substring(0, 10),
+                            "maxStops": mapMaxStops($scope.request.outboundMaxStops),
+                            "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime),
+                            "preferredCabin": $scope.request.outboundPreferedCabin,
+                            "permittedDepartureTime": {
+                                "kind": "qpxexpress#timeOfDayRange",
+                                "earliestTime": mapPermittedTime($scope.request.outboundEarliestTime, $scope.request.outboundEarliestAmPm, true),
+                                "latestTime": mapPermittedTime($scope.request.outboundLatestTime, $scope.request.outboundLatestAmPm, false)
+                            },
+                            "permittedCarrier": [
+                                $scope.request.outboundPermittedCarriers
+                            ],
+                            "alliance": $scope.request.outboundAlliance,
+                            "prohibitedCarrier": [
+                                $scope.request.outboundProhibitedCarriers
+                            ]
+                        }];
+
+                        return {
                             "request": {
-                                "passengers": {
-                                    "kind": "qpxexpress#passengerCounts",
+                                "passengers": {                                    
                                     "adultCount": $scope.request.numTickets,
                                     "childCount": 0,
                                     "infantInLapCount": 0,
                                     "infantInSeatCount": 0,
                                     "seniorCount": 0
                                 },
-                                "slice": [{
-                                    "kind": "qpxexpress#sliceInput",
-                                    "origin": $scope.request.origin,
-                                    "destination": $scope.request.destination,
-                                    "date": $scope.request.outboundDepartureDate.toISOString().substring(0, 10),
-                                    "maxStops": $scope.request.outboundMaxStops,
-                                    "maxConnectionDuration": $scope.request.outboundMaxConnTime,
-                                    "preferredCabin": $scope.request.preferedCabin,
-                                    "permittedDepartureTime": {
-                                        "kind": "qpxexpress#timeOfDayRange",
-                                        "earliestTime": '',
-                                        "latestTime": ''
-                                    },
-                                    "permittedCarrier": [
-                                        $scope.request.permittedCarriers
-                                    ],
-                                    "alliance": '',
-                                    "prohibitedCarrier": [
-                                        $scope.request.prohibitedCarriers
-                                    ]
-                                }],
+                                "slice": slices,
                                 "maxPrice": $scope.request.maxPrice,
-                                "saleCountry": 'CN',
+                                "saleCountry": c.code,
                                 "refundable": $scope.request.refundable,
-                                "solutions": 50
+                                "solutions": 50,
+                                "displaySaleCountry": c.name
                             }    
                         }
+                    });         
+                    
+                    if(!$scope.request.origin || 
+                       !$scope.request.destination || 
+                       !($scope.request.outboundDepartureDate instanceof Date)) {
+                        alert('Must specify origin and destination');
+                        $scope.isSearching = false;                                           
+                    } else if (postDatum.length == 0) {
+                            alert('Must select at least one sale country');
+                    } else {
+                        $location.hash('result');
+                        $anchorScroll();
+                        $scope.isSearching = true;
+                        $scope.doneSearching = false;
                         
-                        console.log(postData);
                         
+                        
+                        console.log($scope.request.outboundMaxStops);
+                        console.log($scope.request.outboundMaxConnTime);
+                        console.log($scope.request.outboundEarliestTime);
+                        console.log(mapPermittedTime($scope.request.outboundEarliestTime, $scope.request.outboundEarliestAmPm, true)); 
+                        console.log(mapPermittedTime($scope.request.outboundLatestTime, $scope.request.outboundLatestAmPm, false)); 
+                        
+                        
+                        console.log(postDatum);                                                                                                
+                        
+                        $scope.response = {
+                            trips: []
+                        }
+                        
+                        /*
+                        _.each(postDatum, function(postData) {                            
+                            qpxService.search(postData).success(function(result) {
+                                $scope.isSearching = false;
+                                $scope.doneSearching = true; 
+                                                                                                
+                                console.log(result);
+                                
+                                var trips = _.map(result.trips.tripOption, function(p) {
+                                    console.log(p);
+                                    return {
+                                        'price': p.saleTotal,
+                                        'saleCountry': postData.request.displaySaleCountry
+                                    };   
+                                });
+
+                                console.log(trips);                                
+                                $scope.response.trips.push(trips);
+                                $scope.response.trips = _.flatten($scope.response.trips, true);
+                                //console.log($scope.response.trips);
+
+                                //console.log(result);
+                            }).error(function(error) {
+                                $scope.isSearching = false;
+                                $scope.doneSearching = true;
+                                console.log(error);
+                            });    
+                        });
+                        */                        
+                        
+                        /*
                         qpxService.search(postData).success(function(result) {
                             $scope.isSearching = false;
                             $scope.doneSearching = true;
@@ -236,18 +394,28 @@
                             $scope.isSearching = false;
                             $scope.doneSearching = true;
                             console.log(error);
-                        });                            
+                        });
+                        */
                     }                    
                 }                
             }
         ]).factory('qpxService', ['$http',
-        function($http) {
-            return {
-                search: function(postData) {
-                    var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + appConstants.key;
-                    return $http.post(url, postData);
+            function($http) {
+                return {
+                    search: function(postData) {
+                        //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBP_LPkbksr2D1s8tixqn-KT6crzJGwr8g'; //appConstants.key;
+                        var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBHkUTnIdsr33SBDKA3Yz60GSyQohiGuNM'; //appConstants.key;
+                        
+                        //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search';
+                        return $http.post(url, postData);
+
+                        /*
+                        var source = rx.Observable.fromPromise($http.post(url, postData)).map(function(response) {
+                            return response.data[1];
+                        });
+                        */
+                    }
                 }
             }
-        }
-    ])
-})(angular.module('ObxQpxApp', ['ngMaterial', 'md.data.table']))
+        ])
+})(angular.module('ObxQpxApp', ['ngMaterial', 'rx', 'md.data.table']))
