@@ -69,14 +69,14 @@
                 
                 var mapMaxStops = function(maxStops) {
                     if (maxStops == 'Non stop') 
-                        return '';
+                        return 0;
                     else
                         return parseInt(maxStops);
                 }
                 
                 var mapMaxConnTime = function(maxConnTime, maxStops) {
                     if (maxStops  == 'Non stop') 
-                        return '';
+                        return 0;
                     else if (maxConnTime == '1 hour')
                         return 60;
                     else if (maxConnTime == '2 hours')
@@ -102,7 +102,7 @@
                     else if (maxConnTime == '12 hours')
                         return 720;
                     else 
-                        return '';
+                        return 0;
                 }
                 
                 $scope.countries = [{
@@ -345,7 +345,7 @@
                             trips: []
                         }
                         
-                        /*
+                        
                         _.each(postDatum, function(postData) {                            
                             qpxService.search(postData).success(function(result) {
                                 $scope.isSearching = false;
@@ -373,7 +373,7 @@
                                 console.log(error);
                             });    
                         });
-                        */                        
+                                         
                         
                         /*
                         qpxService.search(postData).success(function(result) {
