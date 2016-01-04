@@ -62,7 +62,7 @@
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Max connection time</label>
-                                <md-select placeholder="Max connection time" ng-model="request.outboundMaxConnTime">
+                                <md-select placeholder="Max connection time" ng-model="request.outboundMaxConnTime" ng-disabled="request.outboundMaxStops == 'Non stop'">
                                     <div ng-repeat="p in ['1 hour', '2 hours', '3 hours', '4 hours', '5 hours', '6 hours', '7 hours', '8 hours', '9 hours', '10 hours', '11 hours', '12 hours', 'No maximum']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -190,7 +190,7 @@
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Max connection time</label>
-                                <md-select placeholder="Max connection time" ng-model="request.inboundMaxConnTime">
+                                <md-select placeholder="Max connection time" ng-model="request.inboundMaxConnTime" ng-disabled="request.inboundMaxStops == 'Non stop'">
                                     <div ng-repeat="p in ['1 hour', '2 hours', '3 hours', '4 hours', '5 hours', '6 hours', '7 hours', '8 hours', '9 hours', '10 hours', '11 hours', '12 hours', 'No maximum']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>

@@ -74,8 +74,10 @@
                         return parseInt(maxStops);
                 }
                 
-                var mapMaxConnTime = function(maxConnTime) {                    
-                    if (maxConnTime == '1 hour')
+                var mapMaxConnTime = function(maxConnTime, maxStops) {
+                    if (maxStops  == 'Non stop') 
+                        return '';
+                    else if (maxConnTime == '1 hour')
                         return 60;
                     else if (maxConnTime == '2 hours')
                         return 120;
@@ -243,7 +245,7 @@
                                 "destination": $scope.request.destination,
                                 "date": $scope.request.outboundDepartureDate.toISOString().substring(0, 10),
                                 "maxStops": mapMaxStops($scope.request.outboundMaxStops),
-                                "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime),
+                                "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime, $scope.request.outboundMaxStops),
                                 "preferredCabin": $scope.request.outboundPreferedCabin,
                                 "permittedDepartureTime": {                                    
                                     "earliestTime": mapPermittedTime($scope.request.outboundEarliestTime, $scope.request.outboundEarliestAmPm, true),
@@ -261,7 +263,7 @@
                                 "destination": $scope.request.origin,
                                 "date": $scope.request.inboundDepartureDate.toISOString().substring(0, 10),
                                 "maxStops": mapMaxStops($scope.request.inboundMaxStops),
-                                "maxConnectionDuration": mapMaxConnTime($scope.request.inboundMaxConnTime),
+                                "maxConnectionDuration": mapMaxConnTime($scope.request.inboundMaxConnTime, $scope.request.inboundMaxStops),
                                 "preferredCabin": $scope.request.inboundPreferedCabin,
                                 "permittedDepartureTime": {                                    
                                     "earliestTime": mapPermittedTime($scope.request.inboundEarliestTime, $scope.request.inboundEarliestAmPm, true),
@@ -280,7 +282,7 @@
                             "destination": $scope.request.destination,
                             "date": $scope.request.outboundDepartureDate.toISOString().substring(0, 10),
                             "maxStops": mapMaxStops($scope.request.outboundMaxStops),
-                            "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime),
+                            "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime, $scope.request.outboundMaxStops),
                             "preferredCabin": $scope.request.outboundPreferedCabin,
                             "permittedDepartureTime": {
                                 "kind": "qpxexpress#timeOfDayRange",
