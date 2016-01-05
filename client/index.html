@@ -272,20 +272,7 @@
                             <md-button class="md-primary md-fab fa fa-search"  ng-click="submit()">
                             </md-button>
                         </div>
-
-                        <md-content ng-show="fareinfo">
-                            <md-list>
-                                <md-subheader class="md-no-sticky">Results</md-subheader>
-                                <md-list-item class="md-3-line" ng-repeat="item in fareinfo | orderBy:'LowestFare'">
-                                    <div class="md-list-item-text">
-                                        <h3>Destination: {{ item.DestinationLocation }}</h3>
-                                        <h4>Lowest fare: $ {{ item.LowestFare }}</h4>
-                                        <p>Lowest non-stop fare: $ {{ item.LowestNonStopFare }}</p>
-                                    </div>
-                                    <md-divider></md-divider>
-                                </md-list-item>
-                            </md-list>
-                        </md-content>
+                        
                     </md-card-content>
                 </md-card>
 
@@ -304,46 +291,70 @@
                 <div flex="1"></div>
             </div>
 
-            <div layout="row" id="result">
+            <div layout="row" id="result">                
                 <div flex="1"></div>
                 <md-card flex>
                     <md-card-content>
-                        <div layout="row" layout-sm="column" layout-margin layout-padding layout-fill flex>
-                            <md-progress-circular md-mode="indeterminate" ng-show="isSearching"></md-progress-circular>
+                        <md-progress-circular md-mode="indeterminate" ng-show="isSearching && !doneSearching"></md-progress-circular>
 
-
-                            <md-table-container ng-show="doneSearching">
-                                <table md-table>
-                                    <thead md-head>
-                                        <tr md-row>
-                                            <th md-column md-numeric>Price
-                                            </th>
-                                            <th md-column>Sale Country
-                                            </th>
-                                            <th md-column>Departure Time
-                                            </th>
-                                            <th md-column>Arrival Time
-                                            </th>
-                                            <th md-column md-numeric>Duration
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody md-body>
-                                        <tr md-row ng-repeat="trip in response.trips">
-                                            <td md-cell>{{trip.price}}</td>
-                                            <td md-cell>{{trip.saleCountry}}</td>
-                                            <td md-cell>{{trip.departureTime}}</td>
-                                            <td md-cell>{{trip.arrivalTime}}</td>
-                                            <td md-cell>{{trip.duration}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </md-table-container>
-
-                        </div>
+                        <md-content ng-show="doneSearching">
+                            <div layout="row">
+                                <div flex="4"></div>
+                                <md-select placeholder="Currency conversion" ng-model="request.displayInCurrency" ng-change="changeCurrency()">
+                                    <div ng-repeat="p in ['Display in sale country currency', 'Convert to USD', 'Convert to EUR', 'Convert to GBP']">
+                                        <md-option value="{{p}}">{{p}}</md-option>
+                                    </div>
+                                </md-select>
+                                <div flex="80"></div>
+                                    <md-button class="md-primary md-fab fa fa-envelope"  ng-click="sendMail()">
+                                </md-button>                                
+                            </div>
+                            
+                            <md-list>                                
+                                <md-list-item class="md-3-line" ng-repeat="trip in response.trips | orderBy:'LowestFare'">
+                                    <div class="md-list-item-text">                                        
+                                        <div layout="row">
+                                            <table width="100%">
+                                                <tr>
+                                                    <td width="20%">Price: {{trip.currency}} {{trip.price}}</td>
+                                                    <td>Sale Country: {{trip.saleCountry}}</td>
+                                                </tr>
+                                            </table>                                                                                        
+                                        </div>
+                                        <div ng-repeat="slice in trip.slices">
+                                            <table width="100%">
+                                                <tr ng-repeat="segment in slice.segment">
+                                                    <td width="20%">Flight: {{segment.flight.carrier}} {{segment.flight.number}}</td>
+                                                    <td width="15%">Duration: {{segment.duration | durationFilter}}</td>
+                                                    <td width="15%">Cabin: {{segment.cabin}}</td>                                                                            
+                                                    <td>
+                                                        <table width="100%">                                                                                                                    
+                                                            <tr ng-repeat="leg in segment.leg" style="border-bottom: 1px dotted #ADADAD;">
+                                                                <td width="100%">
+                                                                    <p>Depart: {{leg.origin}} {{leg.departureTime}}</p>
+                                                                    <p>Arrive: {{leg.destination}} {{leg.arrivalTime}}</p>
+                                                                    <p>Mileage: {{leg.mileage}}</p>                                                                
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>    
+                                            </table>                                            
+                                        </div>
+                                                                                                                        
+                                        <p>
+                                            <md-checkbox ng-model="data.cb1" aria-label="Checkbox 1" class="md-primary">
+                                                Select
+                                            </md-checkbox>                                        
+                                        </p>
+                                    </div>
+                                    <md-divider></md-divider>
+                                </md-list-item>
+                            </md-list>
+                        </md-content>
                     </md-card-content>
                 </md-card>
-                <div flex="1"></div>
+                <div flex="1"></div>                
             </div>
 
         </md-content>
@@ -367,7 +378,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rx-angular/1.0.4/rx.angular.min.js"></script>
     
     <!-- Lodash -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+    
+    <!-- Moment -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/1.3.0/moment-duration-format.min.js"></script>    
 
     <!-- App specific -->
     <!--<script src="js/constants.js"></script>-->

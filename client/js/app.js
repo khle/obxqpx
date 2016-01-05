@@ -17,8 +17,7 @@
                 }]
             }
         ]).controller('MainCtrl', ['$scope', '$location', '$anchorScroll', '$http', '$mdDialog', 'qpxService',
-            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService) {
-                
+            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService) {                                    
                 var mapPermittedTime = function(time, ampm, defAm) {                                        
                     if (time == '1:00' && (ampm == 'am' && defAm)) {
                         return '01:00';
@@ -236,6 +235,9 @@
                     inboundPermittedCarriers: '',
                     inboundProhibitedCarriers: ''
                 };
+                $scope.sendMail = function() {
+                    
+                };
                 $scope.submit = function() {                    
                     
                     var postDatum = _.map(_.filter($scope.countries, function(c) { return c.wanted; }), function(c) {
@@ -315,36 +317,27 @@
                                 "displaySaleCountry": c.name
                             }    
                         }
-                    });         
+                    });                                        
                     
                     if(!$scope.request.origin || 
-                       !$scope.request.destination || 
-                       !($scope.request.outboundDepartureDate instanceof Date)) {
+                       !$scope.request.destination) {
                         alert('Must specify origin and destination');
                         $scope.isSearching = false;                                           
+                    } else if (!($scope.request.outboundDepartureDate instanceof Date)) {
+                        alert('Must specify outbound date');       
+                    } else if ($scope.request.roundtrip && !($scope.request.inboundDepartureDate instanceof Date)) {
+                        alert('Must specify return date');
                     } else if (postDatum.length == 0) {
                             alert('Must select at least one sale country');
                     } else {
                         $location.hash('result');
                         $anchorScroll();
                         $scope.isSearching = true;
-                        $scope.doneSearching = false;
-                        
-                        
-                        
-                        console.log($scope.request.outboundMaxStops);
-                        console.log($scope.request.outboundMaxConnTime);
-                        console.log($scope.request.outboundEarliestTime);
-                        console.log(mapPermittedTime($scope.request.outboundEarliestTime, $scope.request.outboundEarliestAmPm, true)); 
-                        console.log(mapPermittedTime($scope.request.outboundLatestTime, $scope.request.outboundLatestAmPm, false)); 
-                        
-                        
-                        console.log(postDatum);                                                                                                
+                        $scope.doneSearching = false;                                                                                                                                                                                               
                         
                         $scope.response = {
                             trips: []
-                        }
-                        
+                        }                        
                         
                         _.each(postDatum, function(postData) {                            
                             qpxService.search(postData).success(function(result) {
@@ -355,51 +348,51 @@
                                 
                                 var trips = _.map(result.trips.tripOption, function(p) {
                                     console.log(p);
+                                    
+                                    var matches = p.saleTotal.match(/[a-zA-Z]+|[0-9.]+/g);                                    
                                     return {
-                                        'price': p.saleTotal,
-                                        'saleCountry': postData.request.displaySaleCountry
+                                        'currency': matches[0],
+                                        'price': matches[1],
+                                        'saleCountry': postData.request.displaySaleCountry,
+                                        'slices': p.slice
                                     };   
                                 });
 
                                 console.log(trips);                                
                                 $scope.response.trips.push(trips);
-                                $scope.response.trips = _.flatten($scope.response.trips, true);
-                                //console.log($scope.response.trips);
-
-                                //console.log(result);
+                                $scope.response.trips = _.flatten($scope.response.trips, true);                                
                             }).error(function(error) {
                                 $scope.isSearching = false;
-                                $scope.doneSearching = true;
-                                console.log(error);
+                                $scope.doneSearching = true;                                
                             });    
-                        });
-                                         
-                        
-                        /*
-                        qpxService.search(postData).success(function(result) {
-                            $scope.isSearching = false;
-                            $scope.doneSearching = true;
-                            
-                            var trips = _.map(result.trips.tripOption, function(p) {
-                                return {
-                                    'price': p.saleTotal,
-                                    'saleCountry': 'China'
-                                };   
-                            });
-                            
-                            $scope.response = {
-                                trips: trips
-                            }
-                            
-                            console.log(result);
-                        }).error(function(error) {
-                            $scope.isSearching = false;
-                            $scope.doneSearching = true;
-                            console.log(error);
-                        });
-                        */
+                        });                                                                                                                                         
                     }                    
-                }                
+                }
+                
+                var convertCurrency = function(rate, fromCurrency, toCurrency) {
+                    return {currency: USD, price: matches[1]};   
+                }
+                
+                $scope.changeCurrency = function(saleTotal) {
+                    convertCurrency(p.saleTotal);
+                    
+                    /*
+                    var USD = 1, EUR, CNY;
+                    qpxService.search(postData).success(function(result) {
+                    EUR = result.quotes.USDEUR, CNY = result.quotes.USDCNY;                                
+                    }).error(function(error) {});
+                     */
+                    
+                    if ($scope.request.displayInCurrency === 'Convert to USD') {
+                        return {currency: USD, price: matches[1]};        
+                    } else if ($scope.request.displayInCurrency === 'Convert to GBP') {
+                        return {currency: CNY, price: matches[1]};    
+                    } else if ($scope.request.displayInCurrency === 'Convert to EUR') {
+                        return {currency: EUR, price: matches[1]};   
+                    } else {
+                        return {currency: matches[0], price: matches[1]};    
+                    }
+                }
             }
         ]).factory('qpxService', ['$http',
             function($http) {
@@ -416,8 +409,18 @@
                             return response.data[1];
                         });
                         */
+                    },
+                    getRate: function() {
+                        var url = 'http://www.apilayer.net/api/live?access_key=99ec6a37b631a327f64d356cadf950ab&currencies=USD,EUR,CNY';
+                        return $http.get(url);
                     }
                 }
+            }
+        ]).filter('durationFilter', [
+            function() {
+                return function(input) {
+                    return moment.duration(input, "minutes").format("h [hrs] m [min]");
+                };
             }
         ])
 })(angular.module('ObxQpxApp', ['ngMaterial', 'rx', 'md.data.table']))
