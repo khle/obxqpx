@@ -104,107 +104,32 @@
                         return 0;
                 }
                 
-                $scope.countries = [{
-                    name: 'Argentina',
-                    code: 'AR',
-                    wanted: false
-                }, {
-                    name: 'Australia',
-                    code: 'AU',
-                    wanted: false
-                }, {
-                    name: 'Belgium',
-                    code: 'BE',
-                    wanted: false
-                }, {
-                    name: 'Chile',
-                    code: 'CL',
-                    wanted: false
-                }, {
-                    name: 'China',
-                    code: 'CN',
-                    wanted: false
-                }, {
-                    name: 'Colombia',
-                    code: 'CO',
-                    wanted: false
-                }, {
-                    name: 'Denmark',
-                    code: 'DK',
-                    wanted: false
-                }, {
-                    name: 'Ecuador',
-                    code: 'EC',
-                    wanted: false
-                }, {
-                    name: 'France',
-                    code: 'FR',
-                    wanted: false
-                }, {
-                    name: 'Germany',
-                    code: 'DE',
-                    wanted: false
-                }, {
-                    name: 'Great Britain',
-                    code: 'GB',
-                    wanted: false
-                }, {
-                    name: 'Hong Kong',
-                    code: 'HK',
-                    wanted: false
-                }, {
-                    name: 'India',
-                    code: 'IN',
-                    wanted: false
-                }, {
-                    name: 'Ireland',
-                    code: 'IE',
-                    wanted: false
-                }, {
-                    name: 'Israel',
-                    code: 'IL',
-                    wanted: false
-                }, {
-                    name: 'Italy',
-                    code: 'IT',
-                    wanted: false
-                }, {
-                    name: 'Mexico',
-                    code: 'MX',
-                    wanted: false
-                }, {
-                    name: 'Netherlands',
-                    code: 'NL',
-                    wanted: false
-                }, {
-                    name: 'Norway',
-                    code: 'NO',
-                    wanted: false
-                }, {
-                    name: 'Philippines',
-                    code: 'PH',
-                    wanted: false
-                }, {
-                    name: 'Poland',
-                    code: 'PL',
-                    wanted: false
-                }, {
-                    name: 'South Korea',
-                    code: 'KR',
-                    wanted: false
-                }, {
-                    name: 'Spain',
-                    code: 'ES',
-                    wanted: false
-                }, {
-                    name: 'Switzerland',
-                    code: 'CH',
-                    wanted: false
-                }, {
-                    name: 'United States',
-                    code: 'US',
-                    wanted: false
-                }];
+                $scope.countries = [{name: 'Argentina', code: 'AR', wanted: false}, 
+                                    {name: 'Australia', code: 'AU', wanted: false}, 
+                                    {name: 'Belgium', code: 'BE', wanted: false }, 
+                                    {name: 'Chile', code: 'CL', wanted: false }, 
+                                    {name: 'China', code: 'CN', wanted: false }, 
+                                    {name: 'Colombia', code: 'CO', wanted: false}, 
+                                    {name: 'Denmark', code: 'DK', wanted: false}, 
+                                    {name: 'Ecuador', code: 'EC', wanted: false}, 
+                                    {name: 'France', code: 'FR', wanted: false}, 
+                                    {name: 'Germany', code: 'DE', wanted: false}, 
+                                    {name: 'Great Britain', code: 'GB', wanted: false}, 
+                                    {name: 'Hong Kong', code: 'HK', wanted: false}, 
+                                    {name: 'India', code: 'IN', wanted: false}, 
+                                    {name: 'Ireland', code: 'IE', wanted: false}, 
+                                    {name: 'Israel', code: 'IL', wanted: false}, 
+                                    {name: 'Italy', code: 'IT', wanted: false}, 
+                                    {name: 'Mexico', code: 'MX', wanted: false}, 
+                                    {name: 'Netherlands', code: 'NL', wanted: false}, 
+                                    {name: 'Norway', code: 'NO', wanted: false}, 
+                                    {name: 'Philippines', code: 'PH', wanted: false}, 
+                                    {name: 'Poland', code: 'PL', wanted: false}, 
+                                    {name: 'South Korea', code: 'KR', wanted: false}, 
+                                    {name: 'Spain', code: 'ES', wanted: false}, 
+                                    {name: 'Switzerland', code: 'CH', wanted: false}, 
+                                    {name: 'United States', code: 'US', wanted: false}];
+                
                 $scope.request = {
                     origin: 'SFO',
                     destination: 'HKG',
@@ -234,12 +159,15 @@
                     inboundAlliance: '',
                     inboundPermittedCarriers: '',
                     inboundProhibitedCarriers: ''
-                };
+                }
+                
                 $scope.sendMail = function() {
-                    
-                };
-                $scope.submit = function() {                    
-                    
+                    var body = encodeURIComponent('message goes here');
+                    var href = 'mailto:user@frosch.com?subject=Subject&body=' + body;                    
+                    window.location.href = href;    
+                }
+                
+                $scope.submit = function() {                                        
                     var postDatum = _.map(_.filter($scope.countries, function(c) { return c.wanted; }), function(c) {
                         var slices = $scope.request.roundtrip ? 
                             [{                                
@@ -333,32 +261,31 @@
                         $location.hash('result');
                         $anchorScroll();
                         $scope.isSearching = true;
-                        $scope.doneSearching = false;                                                                                                                                                                                               
-                        
+                        $scope.doneSearching = false;                                                                                                                                                                                                                       
                         $scope.response = {
                             trips: []
-                        }                        
+                        }                                                
                         
                         _.each(postDatum, function(postData) {                            
                             qpxService.search(postData).success(function(result) {
                                 $scope.isSearching = false;
-                                $scope.doneSearching = true; 
-                                                                                                
-                                console.log(result);
+                                $scope.doneSearching = true;                                                                                            
+                                //console.log(result);
                                 
                                 var trips = _.map(result.trips.tripOption, function(p) {
-                                    console.log(p);
-                                    
-                                    var matches = p.saleTotal.match(/[a-zA-Z]+|[0-9.]+/g);                                    
+                                    //console.log(p);
+                                                                        
+                                    var saleTotal = parseQpxFare(p.saleTotal);                                    
                                     return {
-                                        'currency': matches[0],
-                                        'price': matches[1],
+                                        'saleTotal': p.saleTotal,
+                                        'currency': saleTotal.currency,
+                                        'price': saleTotal.price,
                                         'saleCountry': postData.request.displaySaleCountry,
                                         'slices': p.slice
                                     };   
                                 });
-
-                                console.log(trips);                                
+                                //console.log(trips);                                
+                                
                                 $scope.response.trips.push(trips);
                                 $scope.response.trips = _.flatten($scope.response.trips, true);                                
                             }).error(function(error) {
@@ -366,52 +293,76 @@
                                 $scope.doneSearching = true;                                
                             });    
                         });                                                                                                                                         
+                        //Watch price for currency conversion
+                        $scope.$watch('displayInCurrency', function() {
+                            _.each($scope.response.trips, function(trip) {                                
+                                convertCurrency(trip);                                
+                            })
+                        });                        
                     }                    
                 }
                 
-                var convertCurrency = function(rate, fromCurrency, toCurrency) {
-                    return {currency: USD, price: matches[1]};   
+                var parseQpxFare = function(fareInQpxFormat) {
+                    var matches = fareInQpxFormat.match(/[a-zA-Z]+|[0-9.]+/g);
+                    return {price: matches[1], currency: matches[0]}
                 }
                 
-                $scope.changeCurrency = function(saleTotal) {
-                    convertCurrency(p.saleTotal);
+                var convertCurrency = function(trip) {                                        
+                    var saleTotal = parseQpxFare(trip.saleTotal);
                     
-                    /*
-                    var USD = 1, EUR, CNY;
-                    qpxService.search(postData).success(function(result) {
-                    EUR = result.quotes.USDEUR, CNY = result.quotes.USDCNY;                                
-                    }).error(function(error) {});
-                     */
+                    var price = saleTotal.price;
+                    var currency = saleTotal.currency;
                     
-                    if ($scope.request.displayInCurrency === 'Convert to USD') {
-                        return {currency: USD, price: matches[1]};        
-                    } else if ($scope.request.displayInCurrency === 'Convert to GBP') {
-                        return {currency: CNY, price: matches[1]};    
-                    } else if ($scope.request.displayInCurrency === 'Convert to EUR') {
-                        return {currency: EUR, price: matches[1]};   
+                    var requestedCurrencies = currency;                    
+                    
+                    if ($scope.displayInCurrency === 'Convert to USD') {
+                        requestedCurrencies = requestedCurrencies + ',USD';
+                        qpxService.getRate(requestedCurrencies).success(function(result) {
+                            var quotes = result.quotes;                            
+                            var fromCurrency = parseFloat(quotes['USD'+currency]);
+                            var toCurrency = parseFloat(quotes['USDUSD']);
+                            
+                            trip.currency = 'USD';
+                            trip.price = Math.round(parseInt(price) * toCurrency/fromCurrency);
+                        }).error(function(error) {});
+                    } else if ($scope.displayInCurrency === 'Convert to GBP') {
+                        requestedCurrencies = requestedCurrencies + ',GBP';
+                        qpxService.getRate(requestedCurrencies).success(function(result) {
+                            var quotes = result.quotes;                                                        
+                            var fromCurrency = parseFloat(quotes['USD'+currency]);
+                            var toCurrency = parseFloat(quotes['USDGBP']);
+                            
+                            trip.currency = 'GBP';
+                            trip.price = Math.round(parseInt(price) * toCurrency/fromCurrency);
+                        }).error(function(error) {});  
+                    } else if ($scope.displayInCurrency === 'Convert to EUR') {
+                        requestedCurrencies = requestedCurrencies + ',EUR';
+                        qpxService.getRate(requestedCurrencies).success(function(result) {
+                            var quotes = result.quotes;                                                        
+                            var fromCurrency = parseFloat(quotes['USD'+currency]);
+                            var toCurrency = parseFloat(quotes['USDEUR']);
+                            
+                            trip.currency = 'EUR';
+                            trip.price = Math.round(parseInt(price) * toCurrency/fromCurrency);
+                        }).error(function(error) {});  
                     } else {
-                        return {currency: matches[0], price: matches[1]};    
-                    }
+                        trip.currency = currency;
+                        trip.price = price;    
+                    }                 
                 }
+                
+                $scope.changeCurrency = function(saleTotal) {}
             }
         ]).factory('qpxService', ['$http',
             function($http) {
                 return {
                     search: function(postData) {
                         //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBP_LPkbksr2D1s8tixqn-KT6crzJGwr8g'; //appConstants.key;
-                        var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBHkUTnIdsr33SBDKA3Yz60GSyQohiGuNM'; //appConstants.key;
-                        
-                        //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search';
-                        return $http.post(url, postData);
-
-                        /*
-                        var source = rx.Observable.fromPromise($http.post(url, postData)).map(function(response) {
-                            return response.data[1];
-                        });
-                        */
+                        var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBHkUTnIdsr33SBDKA3Yz60GSyQohiGuNM';                        
+                        return $http.post(url, postData);                        
                     },
-                    getRate: function() {
-                        var url = 'http://www.apilayer.net/api/live?access_key=99ec6a37b631a327f64d356cadf950ab&currencies=USD,EUR,CNY';
+                    getRate: function(requestedCurrencies) {
+                        var url = 'http://www.apilayer.net/api/live?access_key=99ec6a37b631a327f64d356cadf950ab&currencies=' + requestedCurrencies;                        
                         return $http.get(url);
                     }
                 }
@@ -420,7 +371,13 @@
             function() {
                 return function(input) {
                     return moment.duration(input, "minutes").format("h [hrs] m [min]");
-                };
+                }
+            }
+        ]).filter('prettyDate', [
+            function() {
+                return function(input) {
+                    return moment(input).format("YYYY-MM-DD HH:mm");
+                }
             }
         ])
 })(angular.module('ObxQpxApp', ['ngMaterial', 'rx', 'md.data.table']))
