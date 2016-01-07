@@ -16,8 +16,8 @@
                     wanted: false
                 }]
             }
-        ]).controller('MainCtrl', ['$scope', '$location', '$anchorScroll', '$http', '$mdDialog', 'qpxService',
-            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService) {                                    
+        ]).controller('MainCtrl', ['$scope', '$location', '$anchorScroll', '$http', '$mdDialog', 'qpxService', '$templateCache', '$compile',
+            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService, $templateCache, $compile) {                                    
                 var mapPermittedTime = function(time, ampm, defAm) {                                        
                     if (time == '1:00' && (ampm == 'am' && defAm)) {
                         return '01:00';
@@ -161,9 +161,36 @@
                     inboundProhibitedCarriers: ''
                 }
                 
-                $scope.sendMail = function() {
-                    var body = encodeURIComponent('message goes here');
-                    var href = 'mailto:user@frosch.com?subject=Subject&body=' + body;                    
+                $scope.sendMail = function() {                                        
+                    var html = '';
+                    
+                    var tripTemplate = $templateCache.get('tripTemplate.html');
+                    var compiledTrip = _.template(tripTemplate);
+                    
+                    var trips = $scope.response.trips.filter(function(trip) { return trip.selectToEmail});
+                    _.each(trips, function(trip) {
+                        var compiledTripHtml = compiledTrip({'currency': trip.currency, 
+                                                             'price': trip.price, 
+                                                             'priceInUSD': trip.priceInUSD, 
+                                                             'saleCountry': trip.saleCountry});
+                        html = html + compiledTripHtml;
+                        _.each(trip.slices, function(slice) {
+                            _.each(slice.segment, function(segment) {                                
+                                var segmentHtml = $templateCache.get('segmentTemplate.html');
+                                
+                                var compiledSegment = _.template(segmentHtml);
+                                var compiledSegmentHtml = compiledSegment({ 'carrier': segment.flight.carrier, 
+                                                            'flightNumber': segment.flight.number, 
+                                                            'duration': segment.duration, 'cabin': segment.cabin });
+                                
+                                html = html + compiledSegmentHtml;
+                            })
+                        })
+                        html = html + '---------------------------';
+                    });                            
+                    
+                    var body = encodeURIComponent(html);
+                    var href = 'mailto:user@frosch.com?subject=Price checks&body=' + body;                    
                     window.location.href = href;    
                 }
                 
@@ -264,10 +291,17 @@
                         $scope.doneSearching = false;                                                                                                                                                                                                                       
                         $scope.response = {
                             trips: []
-                        }                                                
+                        }
+                        
+                        var sortedInsertTrip = function(trips, trip) {
+                            trips.splice(_.sortedIndex(trips, trip.priceInUSD), 0, val);
+                            return trips;
+                        };
                         
                         _.each(postDatum, function(postData) {                            
-                            qpxService.search(postData).success(function(result) {
+                            qpxService.search(postData).then(function(payload) {
+                                var result = payload.data;
+                                
                                 $scope.isSearching = false;
                                 $scope.doneSearching = true;                                                                                            
                                 //console.log(result);
@@ -275,22 +309,36 @@
                                 var trips = _.map(result.trips.tripOption, function(p) {
                                     //console.log(p);
                                                                         
-                                    var saleTotal = parseQpxFare(p.saleTotal);                                    
+                                    var saleTotal = parseQpxFare(p.saleTotal);
+                                    
                                     return {
                                         'saleTotal': p.saleTotal,
+                                        'priceInUSD': 0, //will populate this later,
                                         'currency': saleTotal.currency,
                                         'price': saleTotal.price,
                                         'saleCountry': postData.request.displaySaleCountry,
                                         'slices': p.slice
                                     };   
                                 });
-                                //console.log(trips);                                
+                                //console.log(trips);
                                 
-                                $scope.response.trips.push(trips);
-                                $scope.response.trips = _.flatten($scope.response.trips, true);                                
-                            }).error(function(error) {
-                                $scope.isSearching = false;
-                                $scope.doneSearching = true;                                
+                                _.each(trips, function(trip) {
+                                    //console.log('trip.saleTotal ', trip.saleTotal);
+                                    var requestedCurrencies = 'USD,'+ trip.currency;
+                                    qpxService.getRate(requestedCurrencies).then(function(payload) {
+                                        var result = payload.data;
+                                        var quotes = result.quotes;                                                        
+                                        var fromCurrency = parseFloat(quotes['USD'+trip.currency]);
+                                        var toCurrency = parseFloat(quotes['USDUSD']);
+                                        
+                                        trip.priceInUSD = Math.round(parseInt(trip.price) * toCurrency/fromCurrency);                                                                                
+                                        //console.log(trip);                                                                                
+                                        $scope.response.trips.push(trip);
+                                    });
+                                });
+                                
+                                //$scope.response.trips.push(trips);
+                                //$scope.response.trips = _.flatten($scope.response.trips, true);
                             });    
                         });                                                                                                                                         
                         //Watch price for currency conversion
@@ -298,8 +346,18 @@
                             _.each($scope.response.trips, function(trip) {                                
                                 convertCurrency(trip);                                
                             })
-                        });                        
+                        });                                                                        
                     }                    
+                }
+                
+                var convertToUSD = function(price, currency) {
+                    var requestedCurrencies = 'USD,'+ currency;
+                    qpxService.getRate(requestedCurrencies).success(function(result) {
+                        var quotes = result.quotes;                                                        
+                        var fromCurrency = parseFloat(quotes['USD'+currency]);
+                        var toCurrency = parseFloat(quotes['USDUSD']);                        
+                        return Math.round(parseInt(price) * toCurrency/fromCurrency);
+                    }).error(function(error) {});
                 }
                 
                 var parseQpxFare = function(fareInQpxFormat) {
@@ -357,8 +415,8 @@
             function($http) {
                 return {
                     search: function(postData) {
-                        //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBP_LPkbksr2D1s8tixqn-KT6crzJGwr8g'; //appConstants.key;
-                        var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBHkUTnIdsr33SBDKA3Yz60GSyQohiGuNM';                        
+                        var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBP_LPkbksr2D1s8tixqn-KT6crzJGwr8g'; //appConstants.key;
+                        //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBHkUTnIdsr33SBDKA3Yz60GSyQohiGuNM';                        
                         return $http.post(url, postData);                        
                     },
                     getRate: function(requestedCurrencies) {
