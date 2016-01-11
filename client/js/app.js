@@ -16,8 +16,8 @@
                     wanted: false
                 }]
             }
-        ]).controller('MainCtrl', ['$scope', '$location', '$anchorScroll', '$http', '$mdDialog', 'qpxService', '$templateCache', '$compile',
-            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService, $templateCache, $compile) {                                    
+        ]).controller('MainCtrl', ['$scope', '$location', '$anchorScroll', '$http', '$mdDialog', 'qpxService', '$templateCache', '$compile', '$timeout',
+            function($scope, $location, $anchorScroll, $http, $mdDialog, qpxService, $templateCache, $compile, $timeout) {                                    
                 var mapPermittedTime = function(time, ampm, defAm) {                                        
                     if (time == '1:00' && (ampm == 'am' && defAm)) {
                         return '01:00';
@@ -130,12 +130,16 @@
                                     {name: 'Switzerland', code: 'CH', wanted: false}, 
                                     {name: 'United States', code: 'US', wanted: false}];
                 
+                $scope.today = new Date();
+                $scope.doneSearching = false;
+                $scope.isSearching = false;
+                
                 $scope.request = {
                     origin: 'SFO',
                     destination: 'HKG',
                     outboundMaxStops: 0,
                     outboundMaxConnTime: 0,
-                    outboundDepartureDate: new Date(2016, 4, 1),
+                    outboundDepartureDate: new Date(),
                     outboundEarliestTime: '',
                     outboundEarliestAmPm: '',
                     outboundLatestTime: '',
@@ -158,7 +162,8 @@
                     inboundPreferedCabin: '',
                     inboundAlliance: '',
                     inboundPermittedCarriers: '',
-                    inboundProhibitedCarriers: ''
+                    inboundProhibitedCarriers: '',
+                    allSaleCountries: true
                 }
                 
                 $scope.sendMail = function() {                                        
@@ -194,7 +199,13 @@
                     window.location.href = href;    
                 }
                 
-                $scope.submit = function() {                                        
+                $scope.submit = function() {
+                    if ($scope.request.allSaleCountries) {
+                        $scope.countries = $scope.countries.map(function(country) {
+                            return {name: country.name, code: country.code, wanted: true};   
+                        });            
+                    }
+                    
                     var postDatum = _.map(_.filter($scope.countries, function(c) { return c.wanted; }), function(c) {
                         var slices = $scope.request.roundtrip ? 
                             [{                                
@@ -284,11 +295,8 @@
                         alert('Must specify return date');
                     } else if (postDatum.length == 0) {
                             alert('Must select at least one sale country');
-                    } else {
-                        $location.hash('result');
-                        $anchorScroll();
-                        $scope.isSearching = true;
-                        $scope.doneSearching = false;                                                                                                                                                                                                                       
+                    } else {                        
+                        $scope.isSearching = true;                                                                                                                                                                                                                                          
                         $scope.response = {
                             trips: []
                         }
@@ -336,6 +344,11 @@
                                         $scope.response.trips.push(trip);
                                     });
                                 });
+                                                            
+                                $timeout(function() {
+                                    $location.hash('result-grid');
+                                    $anchorScroll();
+                                }, 1500);
                                 
                                 //$scope.response.trips.push(trips);
                                 //$scope.response.trips = _.flatten($scope.response.trips, true);
@@ -415,8 +428,8 @@
             function($http) {
                 return {
                     search: function(postData) {
-                        var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBP_LPkbksr2D1s8tixqn-KT6crzJGwr8g'; //appConstants.key;
-                        //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBHkUTnIdsr33SBDKA3Yz60GSyQohiGuNM';                        
+                        //var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBP_LPkbksr2D1s8tixqn-KT6crzJGwr8g'; //appConstants.key;
+                        var url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + 'AIzaSyBHkUTnIdsr33SBDKA3Yz60GSyQohiGuNM';                        
                         return $http.post(url, postData);                        
                     },
                     getRate: function(requestedCurrencies) {

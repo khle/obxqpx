@@ -72,7 +72,7 @@
                         </div>
 
                         <div layout>
-                            <md-datepicker style="margin-top: 15px;" ng-model="request.outboundDepartureDate" md-placeholder="Departure Date" required></md-datepicker>
+                            <md-datepicker style="margin-top: 15px;" ng-model="request.outboundDepartureDate" md-placeholder="Departure Date" md-min-date=today md-max-date="request.inboundDepartureDate" required></md-datepicker>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Earliest Departure Time</label>
@@ -200,7 +200,7 @@
                         </div>
                                                 
                         <div layout ng-show="request.roundtrip">
-                            <md-datepicker style="margin-top: 15px;" ng-model="request.inboundDepartureDate" md-placeholder="Return Date" required></md-datepicker>
+                            <md-datepicker style="margin-top: 15px;" ng-model="request.inboundDepartureDate" md-placeholder="Return Date" md-min-date="request.outboundDepartureDate" required></md-datepicker>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label style="color: #AAA;">Earliest Return Time</label>
@@ -240,7 +240,7 @@
                         <div layout ng-show="request.roundtrip">
                             <md-input-container>
                                 <label style="color: #AAA;">Prefered Cabin</label>
-                                <md-select placeholder="Prefered Cabin" ng-model="request.inboundPreferedCabin">
+                                <md-select placeholder={{request.outboundPreferedCabin}} ng-model="request.inboundPreferedCabin">
                                     <div ng-repeat="p in ['Coach', 'Premium Coach', 'Business', 'First Class', 'No preference']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -249,7 +249,7 @@
                             <div flex="5"></div>
                             <md-input-container>
                                 <label style="color: #AAA;">Alliance</label>
-                                <md-select placeholder="Alliance" ng-model="request.inboundAlliance">
+                                <md-select placeholder={{request.outboundAlliance}} ng-model="request.inboundAlliance">
                                     <div ng-repeat="p in ['OneWorld', 'SkyTeam', 'Star', 'None']">
                                         <md-option value="{{p}}">{{p}}</md-option>
                                     </div>
@@ -258,13 +258,26 @@
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Permitted Carriers</label>
-                                <input name="origin" ng-model="request.inboundPermittedCarriers">
+                                <input name="origin" placeholder={{request.outboundPermittedCarriers}} ng-model="request.inboundPermittedCarriers">
                             </md-input-container>
                             <div flex="5"></div>
                             <md-input-container flex>
                                 <label>Prohibited Carriers</label>
-                                <input name="origin" ng-model="request.inboundProhibitedCarriers">
+                                <input name="origin" placeholder={{request.outboundProhibitedCarriers}} ng-model="request.inboundProhibitedCarriers">
                             </md-input-container>
+                        </div>
+                        
+                        <div layout="row">
+                            <md-switch ng-model="request.allSaleCountries" aria-label="SwitchAllSaleCountries">
+                                All sale countries: {{request.allSaleCountries}}
+                            </md-switch>
+                        </div>
+                        
+                        <div layout="row" layout-wrap ng-show="!request.allSaleCountries">
+                            <div flex="10" ng-repeat="country in countries">
+                                <p>{{ country.name }}</p>
+                                <md-checkbox class="md-primary" ng-model="country.wanted"></md-checkbox>
+                            </div>                                                                                    
                         </div>
 
                         <!-- The submit button -->
@@ -275,28 +288,16 @@
                         </div>
                         
                     </md-card-content>
-                </md-card>
-
-                <md-card>
-                    <md-card-content>
-                        <md-list style="padding: 12px;">
-                            <md-card-header class="md-no-sticky">Sale Countries</md-card-header>
-                            <md-list-item ng-repeat="country in countries">
-                                <p>{{ country.name }}</p>
-                                <md-checkbox class="md-primary" ng-model="country.wanted"></md-checkbox>
-                            </md-list-item>
-                        </md-list>
-                    </md-card-content>
-                </md-card>
+                </md-card>                
                 <!-- 1% padding to the right -->
                 <div flex="1"></div>
             </div>
 
-            <div layout="row" id="result">                
+            <div layout="row" id="result-grid" ng-show="isSearching || doneSearching">                
                 <div flex="1"></div>
                 <md-card flex>
                     <md-card-content>
-                        <md-progress-circular md-mode="indeterminate" ng-show="isSearching && !doneSearching"></md-progress-circular>
+                        <md-progress-circular md-mode="indeterminate" ng-show="isSearching"></md-progress-circular>
 
                         <md-content ng-show="doneSearching">
                             <div layout="row">
