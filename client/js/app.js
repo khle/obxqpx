@@ -104,6 +104,31 @@
                         return 0;
                 }
                 
+                var mapCabin = function(cabin) {
+                    if (cabin === 'Coach') {
+                        return 'COACH';
+                    } else if (cabin === 'Premium Coach') {
+                        return 'PREMIUM_COACH';
+                    } else if (cabin === 'Business') {
+                        return 'BUSINESS';
+                    } else if (cabin === 'First Class') {
+                        return 'FIRST';
+                    } else
+                        return '';
+                }
+                
+                var mapAlliance = function(alliance) {
+                    if (alliance === 'OneWorld') {
+                        return 'ONEWORLD';
+                    } else if (alliance === 'SkyTeam') {
+                        return 'SKYTEAM';
+                    } else if (alliance === 'Star') {
+                        return 'STAR';
+                    } else {
+                        return '';
+                    }
+                }
+                
                 $scope.countries = [{name: 'Argentina', code: 'AR', wanted: false}, 
                                     {name: 'Australia', code: 'AU', wanted: false}, 
                                     {name: 'Belgium', code: 'BE', wanted: false }, 
@@ -164,7 +189,7 @@
                     inboundPermittedCarriers: '',
                     inboundProhibitedCarriers: '',
                     allSaleCountries: true
-                }
+                }                                
                 
                 $scope.sendMail = function() {                                        
                     var html = '';
@@ -206,7 +231,7 @@
                         });            
                     }
                     
-                    var postDatum = _.map(_.filter($scope.countries, function(c) { return c.wanted; }), function(c) {
+                    var postDatum = _.map(_.filter($scope.countries, function(saleCountry) { return saleCountry.wanted; }), function(saleCountry) {
                         var slices = $scope.request.roundtrip ? 
                             [{                                
                                 "origin": $scope.request.origin,
@@ -214,17 +239,17 @@
                                 "date": $scope.request.outboundDepartureDate.toISOString().substring(0, 10),
                                 "maxStops": mapMaxStops($scope.request.outboundMaxStops),
                                 "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime, $scope.request.outboundMaxStops),
-                                "preferredCabin": $scope.request.outboundPreferedCabin,
+                                "preferredCabin": mapCabin($scope.request.outboundPreferedCabin),
                                 "permittedDepartureTime": {                                    
                                     "earliestTime": mapPermittedTime($scope.request.outboundEarliestTime, $scope.request.outboundEarliestAmPm, true),
                                     "latestTime": mapPermittedTime($scope.request.outboundLatestTime, $scope.request.outboundLatestAmPm, false)
                                 },
                                 "permittedCarrier": [
-                                    $scope.request.outboundPermittedCarriers
+                                    $scope.request.outboundPermittedCarriers.toUpperCase()
                                 ],
-                                "alliance": $scope.request.outboundAlliance,
+                                "alliance": mapAlliance($scope.request.outboundAlliance),
                                 "prohibitedCarrier": [
-                                    $scope.request.outboundProhibitedCarriers
+                                    $scope.request.outboundProhibitedCarriers.toUpperCase()
                                 ]    
                             }, {                                
                                 "origin": $scope.request.destination,
@@ -232,17 +257,17 @@
                                 "date": $scope.request.inboundDepartureDate.toISOString().substring(0, 10),
                                 "maxStops": mapMaxStops($scope.request.inboundMaxStops),
                                 "maxConnectionDuration": mapMaxConnTime($scope.request.inboundMaxConnTime, $scope.request.inboundMaxStops),
-                                "preferredCabin": $scope.request.inboundPreferedCabin,
+                                "preferredCabin": $scope.request.inboundPreferedCabin === '' ? mapCabin($scope.request.outboundPreferedCabin) : mapCabin($scope.request.inboundPreferedCabin),
                                 "permittedDepartureTime": {                                    
                                     "earliestTime": mapPermittedTime($scope.request.inboundEarliestTime, $scope.request.inboundEarliestAmPm, true),
                                     "latestTime": mapPermittedTime($scope.request.inboundLatestTime, $scope.request.inboundLatestAmPm, false)
                                 },
                                 "permittedCarrier": [
-                                    $scope.request.inboundPermittedCarriers
+                                    $scope.request.inboundPermittedCarriers === '' ? $scope.request.outboundPermittedCarriers.toUpperCase() : $scope.request.inboundPermittedCarriers.toUpperCase()
                                 ],
-                                "alliance": $scope.request.inboundAlliance,
+                                "alliance": $scope.request.inboundAlliance === '' ? mapAlliance($scope.request.outboundAlliance) : mapAlliance($scope.request.inboundAlliance),
                                 "prohibitedCarrier": [
-                                    $scope.request.inboundProhibitedCarriers
+                                    $scope.request.inboundProhibitedCarriers === '' ? $scope.request.outboundProhibitedCarriers.toUpperCase() : $scope.request.inboundProhibitedCarriers.toUpperCase()
                                 ]    
                             }] : 
                         [{                            
@@ -251,20 +276,22 @@
                             "date": $scope.request.outboundDepartureDate.toISOString().substring(0, 10),
                             "maxStops": mapMaxStops($scope.request.outboundMaxStops),
                             "maxConnectionDuration": mapMaxConnTime($scope.request.outboundMaxConnTime, $scope.request.outboundMaxStops),
-                            "preferredCabin": $scope.request.outboundPreferedCabin,
+                            "preferredCabin": mapCabin($scope.request.outboundPreferedCabin),
                             "permittedDepartureTime": {
                                 "kind": "qpxexpress#timeOfDayRange",
                                 "earliestTime": mapPermittedTime($scope.request.outboundEarliestTime, $scope.request.outboundEarliestAmPm, true),
                                 "latestTime": mapPermittedTime($scope.request.outboundLatestTime, $scope.request.outboundLatestAmPm, false)
                             },
                             "permittedCarrier": [
-                                $scope.request.outboundPermittedCarriers
+                                $scope.request.outboundPermittedCarriers.toUpperCase()
                             ],
-                            "alliance": $scope.request.outboundAlliance,
+                            "alliance": mapAlliance($scope.request.outboundAlliance),
                             "prohibitedCarrier": [
-                                $scope.request.outboundProhibitedCarriers
+                                $scope.request.outboundProhibitedCarriers.toUpperCase()
                             ]
                         }];
+                        
+                        //console.log(slices);
 
                         return {
                             "request": {
@@ -277,10 +304,10 @@
                                 },
                                 "slice": slices,
                                 "maxPrice": $scope.request.maxPrice,
-                                "saleCountry": c.code,
+                                "saleCountry": saleCountry.code,
                                 "refundable": $scope.request.refundable,
                                 "solutions": 50,
-                                "displaySaleCountry": c.name
+                                "displaySaleCountry": saleCountry.name
                             }    
                         }
                     });                                        
@@ -359,7 +386,7 @@
                             _.each($scope.response.trips, function(trip) {                                
                                 convertCurrency(trip);                                
                             })
-                        });                                                                        
+                        });                        
                     }                    
                 }
                 

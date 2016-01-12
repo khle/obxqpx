@@ -276,14 +276,14 @@
                         <div layout="row" layout-wrap ng-show="!request.allSaleCountries">
                             <div flex="10" ng-repeat="country in countries">
                                 <p>{{ country.name }}</p>
-                                <md-checkbox class="md-primary" ng-model="country.wanted"></md-checkbox>
+                                <md-checkbox class="md-primary" ng-model="country.wanted" aria-label={{ country.name }}></md-checkbox>
                             </div>                                                                                    
                         </div>
 
                         <!-- The submit button -->
                         <div layout>
                             <div flex="90"></div>
-                            <md-button class="md-primary md-fab fa fa-search"  ng-click="submit()">
+                            <md-button class="md-primary md-fab fa fa-search" aria-label="Submit" ng-click="submit()">
                             </md-button>
                         </div>
                         
@@ -308,7 +308,7 @@
                                     </div>
                                 </md-select>
                                 <div flex="80"></div>
-                                    <md-button class="md-primary md-fab fa fa-envelope"  ng-click="sendMail()">
+                                    <md-button class="md-primary md-fab fa fa-envelope" aria-label="SendMail" ng-click="sendMail()">
                                 </md-button>                                
                             </div>
                             
@@ -327,8 +327,16 @@
                                             <table width="100%">
                                                 <tr ng-repeat="segment in slice.segment">
                                                     <td width="20%">Flight: {{segment.flight.carrier}} {{segment.flight.number}}</td>
-                                                    <td width="15%">Duration: {{segment.duration | durationFilter}}</td>
-                                                    <td width="15%">Cabin: {{segment.cabin}}</td>                                                                            
+                                                    <td width="30%">
+                                                        <table>
+                                                            <tr>
+                                                                <td>
+                                                                    <p>Duration: {{segment.duration | durationFilter}}</p>
+                                                                    <p>Cabin: {{segment.cabin}}</p>                                                                            
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
                                                     <td>
                                                         <table width="100%">                                                                                                                    
                                                             <tr ng-repeat="leg in segment.leg" style="border-bottom: 1px dotted #ADADAD;">
